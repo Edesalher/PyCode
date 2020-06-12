@@ -4,3 +4,5 @@ for number in numbers:
     if number > maxNumber:
         maxNumber = number
 print(maxNumber)
+
+print("This is a test")
