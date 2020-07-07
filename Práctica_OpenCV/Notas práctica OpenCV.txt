@@ -1,0 +1,15 @@
+h = (100, 125)     # color range
+s = (100, 255)     # saturation range.
+v = (20, 255)      # brightness range.
+red = (0, 0, 255)  # red color in BGR
+
+# The color values need to be represented as an array.
+low_color_value = numpy.array([h[0], s[0], v[0]], numpy.uint8)
+high_color_value = numpy.array([h[1], s[1], v[1]], numpy.uint8)
+
+
+En el for:
+- Definer el array del color
+- Aplicar el filtro
+- Encontror contornos
+- Identificar el color

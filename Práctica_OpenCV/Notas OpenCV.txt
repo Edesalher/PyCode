@@ -1,0 +1,49 @@
+for(number=0; number<6; number++)
+number = 0,1,2,3,4,5
+
+numbers = [2,10,5,23,40]
+
+for number in numbers
+number = 2,10,5,23,40
+
+for(number=0; number<5; number++)
+	dato = numbers[number]
+dato = 2,10,5,23,40
+
+
+i in range(0,6) ---> i = 0,...,5
+
+i=0; i<6  ---->>i = 0,...,5
+
+
+contour = [
+	[200, 100],
+	[200, 299],
+	[399, 299],
+	[399, 100],
+	[399, 100],
+	[399, 100],
+	[399, 100],
+	[399, 100]
+]
+
+Al aplicar aprox con cv2.approxPloyDP
+contour = [
+	[200, 100],
+	[200, 400],
+	[400, 300],
+	[400, 100]
+]
+
+array([[[200, 100]],[[ ]],[[ ]],[[ ]]], dtype=int32)
+
+
+cv2.findContours((image, contours, hierarchy), mode, method, offset)
+
+cv2.circle(image, (300, 200), 125, (255), -1)
+
+
+for i in range(len(lista))
+
+
+find_figure(image, figure, color)
