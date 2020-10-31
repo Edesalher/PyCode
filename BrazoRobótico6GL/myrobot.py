@@ -140,7 +140,7 @@ class Robot:
         zc = spherical_wrist_center[2]
 
         # The matrix "solutions" is prepared that will contain the 8 possible configurations of q1, ..., q5.
-        solutions = np.zeros((8, 5))
+        solutions = np.zeros((8, 6))
 
         """ **** CASE "A" WITH theta1 POSITIVE **** """
 
@@ -230,48 +230,51 @@ class Robot:
                 Azyz = euler_angles_zyz(R)
 
                 # The result of q4, q5 and q6 are added to the solution matrix.
-                solutions[(k - 1) * 2 + (j - 1) * 4, 3:6] = [Azyz[0, 0], Azyz[0, 1], Azyz[0, 2]]
-                solutions[(k - 1) * 2 + (j - 1) * 4 + 1, 3:6] = [Azyz[1, 0], Azyz[1, 1], Azyz[1, 2]]
+                solutions[(k - 1) * 2 + (j - 1) * 4, 3] = Azyz[0, 0]
+                solutions[(k - 1) * 2 + (j - 1) * 4, 4] = Azyz[0, 1]
+                solutions[(k - 1) * 2 + (j - 1) * 4, 5] = Azyz[0, 2]
+
+                solutions[(k - 1) * 2 + (j - 1) * 4 + 1, 3] = Azyz[1, 0]
+                solutions[(k - 1) * 2 + (j - 1) * 4 + 1, 4] = Azyz[1, 1]
+                solutions[(k - 1) * 2 + (j - 1) * 4 + 1, 5] = Azyz[1, 2]
 
         return solutions
 
-    def get_tm0(self, system_0, system_m, system_h):
+    def get_tm0(self, system_0, system_w, system_m, system_h):
         """
-        DESCRIPCIÓN:
-        Se busca obtener la Tm0 que representa la pose que el manipulador final debe tener para poder
-        ubicarse donde se desea recoger/soltar los cubitos que se identificarán en la banda transportadora.
+        DESCRIPTION:
+        This function allows to obtain the Tm0 that represents the pose that the final manipulator must have
+        to be located where we want.
 
-            DATO: La pose que se desea para el manipulador final se indicará en coppeliaSim con un dummy
-            llamado "mf". El cuál se moverá y orientara según la pose que se desea para el manipulador final.
+            FACT: The desired pose for the final manipulator will be indicated in coppeliaSim with a dummy
+                  called "mf". This dummy will move and orient according to the pose that is desired for the
+                  final manipulator.
 
-        Para encontrar la Tm0 se recurirá a la ecuación aprendida en clase:
+        To find the Tm0 we will use the equation learned in class.
             Tm0 = Tw0 * Thw * (Thm)^(-1)
-            Donde:
-                Tm0 --> Pose del manipulador final respecto del sistema 0. SE OBTENDRÁ NUMÉRICAMENTE.
-                Tw0 --> Matriz T que relaciona al sistema de trabajo w con el sistema 0.
-                Thw --> Matriz T que relaciona al sistema de la herramienta (el cubo) con el sistema de trabajo w.
-                Thm --> Matriz T que relaciona al sistema de la herramienta (el cubo) con el manipulador final.
 
-        Para el caso de este brazo el sistema w coincidirá siempre con el sistema h del cubo por lo tanto la
-        Thw será siempre la identidad, entonces, la ecuación anterior se reduce a:
-            Cambiando nombre de sistema h por sistema c...
+                Tm0 --> Pose of the final manipulator with respect to system 0. IT IS KNOWN NUMERICALLY.
+                Tw0 --> Matrix T that relates the work system w with the system 0.
+                Thw --> Matrix T that relates the system of the tool h with the work system w.
+                Thm --> Matrix T that relates the system of the tool h with the final manipulator.
 
-            Tm0 = Tc0 * (Tcm)^(-1)
+        The matrices Tw0, Thw and Thm are obtained with simxGetObjectMatrix that return the x, y, z position and
+        the orientation with respect the desired systey.
 
-        Las matrices Tc0 y Tcm se obtienen con simxGetObjectMatrix que da la posición x, y, z asi como la
-        orientación respecto al sistema que se desee.
-
-        :return Tmo: matriz que representa la pose del manipulador final.
+        :return Tmo: Matrix that represents the pose of the final manipulator.
         """
-        # Se obtiene las matrices Tc0 y Tcm que se deben convertir con sp.Matrix a su forma de matriz.
-        th0 = self.client.simxGetObjectMatrix(system_h, system_0, self.client.simxServiceCall())[1]
-        Th0 = sp.Matrix([th0[:4], th0[4:8], th0[8:12], [0, 0, 0, 1]])
+        # The matrices Tw0, Thw and Thm are obtained and they must be converted with sp.Matrix to their matrix form.
+        tw0 = self.client.simxGetObjectMatrix(system_w, system_0, self.client.simxServiceCall())[1]
+        Tw0 = sp.Matrix([tw0[:4], tw0[4:8], tw0[8:12], [0, 0, 0, 1]])
+
+        thw = self.client.simxGetObjectMatrix(system_h, system_w, self.client.simxServiceCall())[1]
+        Thw = sp.Matrix([thw[:4], thw[4:8], thw[8:12], [0, 0, 0, 1]])
 
         thm = self.client.simxGetObjectMatrix(system_h, system_m, self.client.simxServiceCall())[1]
         Thm = sp.Matrix([thm[:4], thm[4:8], thm[8:12], [0, 0, 0, 1]])
 
-        # Se determina la Tm0 utilizando la ecuación planteada arriba.
-        Tm0 = Th0 * Thm.inv()
+        # The Tm0 is determined using the equation shown above.
+        Tm0 = Tw0 * Thw * Thm.inv()
 
         return Tm0
 
