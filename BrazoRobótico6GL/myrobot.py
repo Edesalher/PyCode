@@ -22,7 +22,7 @@ def print_matrix(matrix):
     for m in range(len(matrix[:, 0])):
         print('[ ', end='')
         for n in range(len(matrix[0, :])):
-            print(f'{matrix[m, n]} ', end='')
+            print(f'{matrix[m, n]}', end='')
             if n < len(matrix[0, :]) - 1:
                 print(', ', end='')
         print(' ]')
@@ -64,15 +64,30 @@ def euler_angles_zyz(R):
     :return solution_zyz: 2x3 matrix that contains, in separate rows, the 2 solutions for phi, theta y psi that
                           make R = Rz(phi)*Ry(theta)*Rz(psi)
     """
-    stheta = sp.sqrt(1 - R[2, 2]**2)
+    # stheta = sp.sqrt(1 - R[2, 2]**2)
+    ctheta = sp.sqrt(1 - (-R[2, 2])**2)
 
+    # if stheta < 0.000001:
+    #     if R[2, 2] > 0:
+    #         theta1 = 0
+    #         phi1 = 0
+    #         psi1 = sp.atan2(-R[0, 1], R[0, 0])
+    #     else:
+    #         theta1 = sp.pi
+    #         phi1 = 0
+    #         psi1 = -sp.atan2(-R[0, 1], -R[0, 0])
+    #
+    #     theta2 = theta1
+    #     phi2 = phi1
+    #     psi2 = psi1
+    # else:
     # Solution with sin(theta) > 0.
-    theta1 = sp.atan2(stheta, R[2, 2])
+    theta1 = sp.atan2(R[2, 2], ctheta)
     phi1 = sp.atan2(R[1, 2], R[0, 2])
     psi1 = sp.atan2(R[2, 1], -R[2, 0])
 
     # Solution with sin(theta) < 0.
-    theta2 = sp.atan2(-stheta, R[2, 2])
+    theta2 = sp.atan2(R[2, 2], -ctheta)
     phi2 = sp.atan2(-R[1, 2], -R[0, 2])
     psi2 = sp.atan2(-R[2, 1], R[2, 0])
 
@@ -111,6 +126,7 @@ class Robot:
         for m in range(len(self.dh[:, 0])):
             # The matrix corresponding to the chosen parameters a, alpha, d theta is calculated.
             A = get_t_from_dh(self.dh[m, 0], self.dh[m, 1], self.dh[m, 2], self.dh[m, 3])
+            # print_matrix(A)
             # The transformation matrix found is post-multiplied to the previous result.
             To = To * A
         T = sp.simplify(To)
@@ -240,7 +256,7 @@ class Robot:
 
         return solutions
 
-    def get_tm0(self, system_0, system_w, system_m, system_h):
+    def get_tm0(self, system_0, system_m):
         """
         DESCRIPTION:
         This function allows to obtain the Tm0 that represents the pose that the final manipulator must have
@@ -264,17 +280,20 @@ class Robot:
         :return Tmo: Matrix that represents the pose of the final manipulator.
         """
         # The matrices Tw0, Thw and Thm are obtained and they must be converted with sp.Matrix to their matrix form.
-        tw0 = self.client.simxGetObjectMatrix(system_w, system_0, self.client.simxServiceCall())[1]
-        Tw0 = sp.Matrix([tw0[:4], tw0[4:8], tw0[8:12], [0, 0, 0, 1]])
+        # tw0 = self.client.simxGetObjectMatrix(system_w, system_0, self.client.simxServiceCall())[1]
+        # Tw0 = sp.Matrix([tw0[:4], tw0[4:8], tw0[8:12], [0, 0, 0, 1]])
+        #
+        # thw = self.client.simxGetObjectMatrix(system_h, system_w, self.client.simxServiceCall())[1]
+        # Thw = sp.Matrix([thw[:4], thw[4:8], thw[8:12], [0, 0, 0, 1]])
+        #
+        # thm = self.client.simxGetObjectMatrix(system_h, system_m, self.client.simxServiceCall())[1]
+        # Thm = sp.Matrix([thm[:4], thm[4:8], thm[8:12], [0, 0, 0, 1]])
 
-        thw = self.client.simxGetObjectMatrix(system_h, system_w, self.client.simxServiceCall())[1]
-        Thw = sp.Matrix([thw[:4], thw[4:8], thw[8:12], [0, 0, 0, 1]])
-
-        thm = self.client.simxGetObjectMatrix(system_h, system_m, self.client.simxServiceCall())[1]
-        Thm = sp.Matrix([thm[:4], thm[4:8], thm[8:12], [0, 0, 0, 1]])
+        tm0 = self.client.simxGetObjectMatrix(system_m, system_0, self.client.simxServiceCall())[1]
+        Tm0 = sp.Matrix([tm0[:4], tm0[4:8], tm0[8:12], [0, 0, 0, 1]])
 
         # The Tm0 is determined using the equation shown above.
-        Tm0 = Tw0 * Thw * Thm.inv()
+        # Tm0 = Tw0 * Thw * Thm.inv()
 
         return Tm0
 
