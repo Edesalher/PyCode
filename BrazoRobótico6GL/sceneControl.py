@@ -13,7 +13,7 @@ Denavit-Hartenberg description for the robotic arm with 6 degrees of freedom.
    0.2  |  0      |  0     |    q2
    0.2  |  0      |  0     |    q3
    0    | -pi/2   |  0     |    q4
-   0    |  pi/2   |  0     |    q5
+   0    |  pi/2   |  0     |    q5 + pi/2
    0    |  0      |  0.05  |    q6
 """
 
@@ -43,9 +43,9 @@ with b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient', 'b0RemoteApi') as c
 
     # Getting each handle to use to determine the Tm0 of interest.
     o = client.simxGetObjectHandle('sys0', client.simxServiceCall())[1]
-    w = client.simxGetObjectHandle('work_system', client.simxServiceCall())[1]
+    # w = client.simxGetObjectHandle('work_system', client.simxServiceCall())[1]
     m = client.simxGetObjectHandle('mf', client.simxServiceCall())[1]
-    h = client.simxGetObjectHandle('Cuboid', client.simxServiceCall())[1]
+    # h = client.simxGetObjectHandle('Cuboid', client.simxServiceCall())[1]
 
     # Definition of the variable for each angle of each joint of the robotic arm.
     q1 = sp.symbols('q1')
@@ -54,25 +54,35 @@ with b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient', 'b0RemoteApi') as c
     q4 = sp.symbols('q4')
     q5 = sp.symbols('q5')
     q6 = sp.symbols('q6')
+    # q1 = 0
+    # q2 = 0
+    # q3 = 0
+    # q4 = 0
+    # q5 = 0
+    # q6 = 0
 
     # Creating the D-H matrix containing the Denavit-Hartenberg description of the robotic arm.
     dh = sp.Matrix([[0,   sp.pi/2,  0.1,  q1],
                     [0.2, 0,        0,    q2],
                     [0.2, 0,        0,    q3],
                     [0,   -sp.pi/2, 0,    q4],
-                    [0,   sp.pi/2,  0,    q5],
+                    [0,   sp.pi/2,  0,    q5 + sp.pi/2],
                     [0,   0,        0.05, q6]])
 
     # THE ROBOTIC ARM IS CREATED.
     robot = Robot(joints, dh, client)
 
-    # Determining the matrix Tm0 corresponding to the desired pose for the final manipulator.
-    Tm0 = robot.get_tm0(o, w, m, h)
+    # dk = robot.do_direct_kinematics()
+    # print_matrix(dk)
+
+    # Getting the matrix Tm0 corresponding to the desired pose for the final manipulator.
+    Tm0 = robot.get_tm0(o, m)
+    print('Tm0 DESTINO:')
     print_matrix(Tm0)
 
     # Calculating the inverse kinematics for the pose Tm0.
     tm0_solutions = robot.do_inverse_kinematics(Tm0)
-
+    print('SOLUCIONES PARA q1, ..., q5:')
     print_matrix(tm0_solutions)
 
     # ******************************************* EJECUCIÓN DE LA ESCENA ******************************************** #
@@ -87,6 +97,7 @@ with b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient', 'b0RemoteApi') as c
 
     while listener.is_alive():
         robot.set_joints(joints, tm0_solutions[0, :])
+        pass
 
     # time.sleep(2)
     # FINISHING THE SIMULATION
