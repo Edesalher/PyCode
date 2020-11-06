@@ -227,8 +227,8 @@ class Robot:
                 fi+ = q4+ = Atan2(R13, R23)
                 fi- = q4- = Atan2(-R13, -R23)
                 
-                theta+ = q5+ = Atan2(R33, sqrt(1-R33²))
-                theta- = q5- = Atan2(R33, -sqrt(1-R33²))
+                theta+ = q5+ = Atan2(sqrt(1-(-R33)²), R33)
+                theta- = q5- = Atan2(-sqrt(1-(-R33)²), R33)
                 
                 psi+ = q6+ = Atan2(-R31, R32)
                 psi- = q6- = Atan2(R31, -R32)
