@@ -82,7 +82,7 @@ with b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient', 'b0RemoteApi') as c
 
     # Calculating the inverse kinematics for the pose Tm0.
     tm0_solutions = robot.do_inverse_kinematics(Tm0)
-    print('SOLUCIONES PARA q1, ..., q5:')
+    print('SOLUCIONES PARA q1, ..., q6:')
     print_matrix(tm0_solutions)
 
     # ******************************************* EJECUCIÓN DE LA ESCENA ******************************************** #
@@ -96,7 +96,7 @@ with b0RemoteApi.RemoteApiClient('b0RemoteApi_pythonClient', 'b0RemoteApi') as c
     listener.start()
 
     while listener.is_alive():
-        robot.set_joints(joints, tm0_solutions[0, :])
+        robot.set_joints(joints, tm0_solutions[2, :])
         pass
 
     # time.sleep(2)

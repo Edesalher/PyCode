@@ -141,7 +141,7 @@ class Robot:
 
         :param tm0: Desired pose for the final manipulator. IT IS KNOWN NUMERICALLY.
 
-        :return qs: 8x5 matrix containing the 8 possible solutions for the 5 angles q1, ..., q5.
+        :return qs: 8x5 matrix containing the 8 possible solutions for the 6 angles q1, ..., q6.
         """
         # The values of a and d of interest are obtained.
         a2 = self.dh[1, 0]
@@ -203,7 +203,7 @@ class Robot:
         q1, q2 and q3.
         Through the for loops, each possible combination (or row) of q1, q2 and q3 is traversed and with them the 
         solution for q4, q5 and q6 that corresponds to that combination (or row) is obtained, and in that way the
-        configuration formed by q1, ..., q5 is completed.
+        configuration formed by q1, ..., q6 is completed.
         """
         for j in range(1, 3):
             theta1 = solutions[(j - 1) * 4, 0]
