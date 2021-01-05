@@ -2,11 +2,11 @@ import cv2
 
 # To capture video from the camera or read a video file.
 capture = cv2.VideoCapture(0)
-# capture = cv2.VideoCapture('record.avi')
+# capture = cv2.VideoCapture('Files/record.avi')
 
 # To save a video.
 # Define the codec and create VideoWriter object
-# out = cv2.VideoWriter('record.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, (640, 480))
+# out = cv2.VideoWriter('Files/record.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, (640, 480))
 
 while capture.isOpened():
     # Capture frame-by-frame.
